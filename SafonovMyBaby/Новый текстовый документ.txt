@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SafonovMyBaby.MainPage">
+
+    <Grid>
+        <!-- Правая нижняя четверть экрана с кнопками -->
+        <Grid  >
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Заголовки над колонками -->
+            <Label Grid.Row="1" Grid.Column="2"
+                   Text="Инбокс"
+                   FontSize="14"
+                   HorizontalOptions="Center"
+                   Margin="5"/>
+
+            <Label Grid.Row="1" Grid.Column="3"
+                   Text="Нейро"
+                   FontSize="14"
+                   HorizontalOptions="Center"
+                   Margin="5"/>
+
+            <!-- Заголовки слева от строк -->
+            <Label Grid.Row="2" Grid.Column="1"
+                   Text="Писать"
+                   FontSize="14"
+                   VerticalOptions="Center"
+                   Rotation="-90"
+                   Margin="5"/>
+
+            <Label Grid.Row="3" Grid.Column="1"
+                   Text="Говорить"
+                   FontSize="14"
+                   VerticalOptions="Center"
+                   Rotation="-90"
+                   Margin="5"/>
+
+            <!-- Кнопки 2x2 -->
+            <Button Grid.Row="2" Grid.Column="2"
+                    x:Name="Button1"
+                    Text=""
+                    Clicked="OnButton1Clicked"
+                    Margin="5"/>
+
+            <Button Grid.Row="2" Grid.Column="3"
+                    x:Name="Button2"
+                    Text=""
+                    Clicked="OnButton2Clicked"
+                    Margin="5"/>
+
+            <Button Grid.Row="3" Grid.Column="2"
+                    x:Name="Button3"
+                    Text=""
+                    Clicked="OnButton3Clicked"
+                    Margin="5"/>
+
+            <Button Grid.Row="3" Grid.Column="3"
+                    x:Name="Button4"
+                    Text=""
+                    Clicked="OnButton4Clicked"
+                    Margin="5"/>
+        </Grid>
+    </Grid>
+
+</ContentPage>
