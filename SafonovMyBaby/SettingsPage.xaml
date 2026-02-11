@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SafonovMyBaby.SettingsPage"
+             Title="Настройки">
+
+    <ScrollView Padding="20">
+        <VerticalStackLayout Spacing="20" VerticalOptions="Start">
+
+            <!-- Заголовок -->
+            <Label Text="Настройки приложения"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,20"/>
+
+            <!-- Путь к файлу -->
+            <Frame BackgroundColor="#F5F5F5"
+                   Padding="15"
+                   CornerRadius="10">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Путь к файлу"
+                           FontSize="16"
+                           FontAttributes="Bold"/>
+                    <Entry x:Name="FilePathEntry"
+                           Placeholder="/storage/emulated/0/Documents/Hi/01 Список дел на сейчас.md"
+                           TextColor="Black"
+                           TextChanged="OnSettingChanged"/>
+                    <Label Text="Путь к markdown-файлу для сохранения заметок"
+                           FontSize="12"
+                           TextColor="Gray"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Текст для поиска -->
+            <Frame BackgroundColor="#F5F5F5"
+                   Padding="15"
+                   CornerRadius="10">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Текст для поиска"
+                           FontSize="16"
+                           FontAttributes="Bold"/>
+                    <Entry x:Name="SearchTextEntry"
+                           Placeholder="Инбоксы:"
+                           TextColor="Black"
+                           TextChanged="OnSettingChanged"/>
+                    <Label Text="Текст, после которого будут вставляться новые записи"
+                           FontSize="12"
+                           TextColor="Gray"/>
+                </VerticalStackLayout>
+            </Frame>
+
+
+            <!-- Кнопка сброса -->
+            <Button x:Name="ResetButton"
+                    Text="Сбросить настройки по умолчанию"
+                    Clicked="OnResetClicked"
+                    BackgroundColor="Transparent"
+                    TextColor="Red"
+                    BorderColor="Red"
+                    BorderWidth="1"
+                    CornerRadius="5"
+                    Margin="0,10,0,0"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

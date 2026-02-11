@@ -4,6 +4,20 @@
              x:Class="SafonovMyBaby.MainPage">
 
     <Grid>
+        <!-- Кнопка настроек (шестерёнка) в верхнем правом углу -->
+        <Button Text="⚙"
+                FontSize="24"
+                Clicked="OnSettingsClicked"
+                HorizontalOptions="End"
+                VerticalOptions="Start"
+                WidthRequest="60"
+                HeightRequest="60"
+                Padding="0"
+                Margin="10"
+                BackgroundColor="#E0E0E0"
+                CornerRadius="30"
+                ZIndex="1"/>
+
         <!-- Правая нижняя четверть экрана с кнопками -->
         <Grid HorizontalOptions="End" VerticalOptions="End"
               WidthRequest="320" HeightRequest="420"

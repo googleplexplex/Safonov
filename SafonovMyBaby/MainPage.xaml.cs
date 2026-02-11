@@ -2,9 +2,18 @@
 {
     public partial class MainPage : ContentPage
     {
+        private const string DefaultFilePath = "/storage/emulated/0/Documents/Hi/01 Список дел на сейчас.md";
+        private const string DefaultSearchText = "Инбоксы:";
+
         public MainPage()
         {
             InitializeComponent();
+        }
+
+        private async void OnSettingsClicked(object? sender, EventArgs e)
+        {
+            // Открываем страницу настроек
+            await Navigation.PushAsync(new SettingsPage());
         }
 
         private async void OnButton1Clicked(object? sender, EventArgs e)
@@ -40,7 +49,8 @@
         {
             try
             {
-                string filePath = "/storage/emulated/0/Documents/Hi/01 Список дел на сейчас.md";
+                // Получаем путь к файлу из настроек
+                string filePath = Preferences.Get("FilePath", DefaultFilePath);
 
                 // Проверяем, существует ли файл
                 string[]? existingLines = null;
@@ -49,36 +59,39 @@
                     existingLines = await File.ReadAllLinesAsync(filePath);
                 }
 
-                // Ищем строку "Инбоксы:" и вставляем текст после неё
+                // Получаем текст для поиска из настроек
+                string searchText = Preferences.Get("SearchText", DefaultSearchText);
+
+                // Ищем строку и вставляем текст после неё
                 List<string> newLines = new List<string>();
 
                 if (existingLines != null)
                 {
-                    bool foundInboxes = false;
+                    bool foundSearchLine = false;
                     for (int i = 0; i < existingLines.Length; i++)
                     {
                         newLines.Add(existingLines[i]);
 
-                        // Если нашли строку "Инбоксы:" (ТОЛЬКО это слово)
-                        if (existingLines[i].Trim() == "Инбоксы:")
+                        // Если нашли строку поиска (ТОЛЬКО это слово)
+                        if (existingLines[i].Trim() == searchText.Trim())
                         {
-                            foundInboxes = true;
+                            foundSearchLine = true;
                             // Вставляем наш текст после этой строки
                             newLines.Add(text);
                         }
                     }
 
-                    // Если не нашли строку "Инбоксы:", добавляем её в конец
-                    if (!foundInboxes)
+                    // Если не нашли строку поиска, добавляем её в конец
+                    if (!foundSearchLine)
                     {
-                        newLines.Add("Инбоксы:");
+                        newLines.Add(searchText);
                         newLines.Add(text);
                     }
                 }
                 else
                 {
                     // Файл не существует, создаём новый
-                    newLines.Add("Инбоксы:");
+                    newLines.Add(searchText);
                     newLines.Add(text);
                 }
 
