@@ -1,6 +1,20 @@
+# Visual Studio
 .vs/
 *.user
 *.suo
 bin/
 obj/
-ibf.txt
+
+# Secrets
+SafonovMyBaby/ibf.txt
+SafonovHost/.env
+
+# Python
+SafonovHost/vault/
+SafonovHost/__pycache__/
+SafonovHost/*.pyc
+SafonovHost/venv/
+
+# Reports
+SafonovHost/report_*.txt
+
