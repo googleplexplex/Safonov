@@ -1,4 +1,6 @@
-﻿namespace SafonovMyBaby
+﻿using SafonovMyBaby.Services;
+
+namespace SafonovMyBaby
 {
     public partial class MainPage : ContentPage
     {
@@ -36,7 +38,21 @@
         private async void OnButton3Clicked(object? sender, EventArgs e)
         {
             // Кнопка 3: Говорить + Инбокс
-            await DisplayAlert("В разработке", "Кнопка 3 (Говорить + Инбокс) скоро будет работать", "ОК");
+            // Получаем сервис распознавания речи через DI
+            var speechService = Handler.MauiContext.Services.GetService<ISpeechRecognitionService>();
+
+            if (speechService != null)
+            {
+                await Navigation.PushAsync(new SpeechPage(speechService));
+            }
+            else
+            {
+#if ANDROID
+                await DisplayAlert("Ошибка", "Сервис распознавания речи недоступен. Убедитесь, что вы используете устройство на Android.", "OK");
+#else
+                await DisplayAlert("Ошибка", "Распознавание речи доступно только на Android.", "OK");
+#endif
+            }
         }
 
         private async void OnButton4Clicked(object? sender, EventArgs e)

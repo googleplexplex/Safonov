@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SafonovMyBaby.SpeechPage"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Верхняя часть с распознанным текстом -->
+        <Frame Grid.Row="0"
+                Padding="20"
+                Margin="20,20,20,0"
+                CornerRadius="15"
+                BackgroundColor="{AppThemeBinding Light=White, Dark=#2B2B2B}"
+                HasShadow="True">
+            <Editor x:Name="ResultText"
+                    Text="Распознанный текст появится здесь..."
+                    FontSize="18"
+                    IsReadOnly="True"
+                    AutoSize="TextChanges"
+                    HeightRequest="150"
+                    BackgroundColor="Transparent" />
+        </Frame>
+
+        <!-- Центральная часть с большой кнопкой микрофона -->
+        <Grid Grid.Row="1"
+              RowDefinitions="*,Auto,*"
+              ColumnDefinitions="*,Auto,*">
+
+            <Button Grid.Row="1"
+                    Grid.Column="1"
+                    x:Name="RecordButton"
+                    Text="🎤"
+                    FontSize="80"
+                    WidthRequest="200"
+                    HeightRequest="200"
+                    CornerRadius="100"
+                    BackgroundColor="#512BD4"
+                    TextColor="White"
+                    Clicked="OnRecordClicked"
+                    SemanticProperties.Hint="Начать запись" />
+
+            <Label Grid.Row="2"
+                   Grid.Column="1"
+                   x:Name="StatusLabel"
+                   Text="Нажмите на микрофон и начните говорить"
+                   FontSize="16"
+                   HorizontalOptions="Center"
+                   Margin="0,20,0,0"
+                   TextColor="{AppThemeBinding Light=Gray, Dark=LightGray}" />
+        </Grid>
+
+        <!-- Нижняя часть с кнопкой отмены -->
+        <Button Grid.Row="2"
+                x:Name="CancelButton"
+                Text="Отмена"
+                FontSize="18"
+                Margin="20,0,20,20"
+                Padding="15"
+                CornerRadius="10"
+                BackgroundColor="#FF3B30"
+                TextColor="White"
+                Clicked="OnCancelClicked"
+                SemanticProperties.Hint="Отмена и возврат на главный экран" />
+
+    </Grid>
+
+</ContentPage>
