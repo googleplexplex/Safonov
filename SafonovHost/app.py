@@ -307,7 +307,7 @@ class TaskProcessor:
             github_manager.pull_changes()
 
             # 1. Отправляем сообщение в Telegram
-            message_text = f"🔔🤖✨ Промпт: `{prompt}`\n\n🆔 GUID: {guid}"
+            message_text = f"Промпт: `{prompt}`\n\n🚀 Принято в работу!\n\nGUID: {guid}"
 
             if TELEGRAM_CHAT_ID:
                 msg_id = send_telegram_message(message_text, TELEGRAM_CHAT_ID)
@@ -358,14 +358,23 @@ class TaskProcessor:
                     ]
                 }
 
-                # Добавляем stdout/stderr к сообщению как обычный текст
-                final_message = message_text
-
+                # Формируем финальное сообщение - stdout/stderr вместо "Принято в работу"
                 if result.stdout.strip():
-                    final_message += f"\n\nSTDOUT:\n{result.stdout.strip()}"
+                    final_message = f"Промпт: `{prompt}`\n\nSTDOUT:\n{result.stdout.strip()}"
+                else:
+                    final_message = message_text
 
                 if result.stderr.strip():
                     final_message += f"\n\nSTDERR:\n{result.stderr.strip()}"
+
+                # Добавляем GUID
+                final_message += f"\n\nGUID: {guid}"
+
+                # Формируем ссылку на GitHub коммит
+                github_commit_url = f"{GITHUB_REPO_URL.replace('.git', '')}/commit/{last_commit_sha}"
+
+                # Добавляем ссылку к сообщению
+                final_message += f"\n\n🔗 Ссылка на коммит:\n{github_commit_url}"
 
                 # Редактируем сообщение
                 edit_telegram_message(
@@ -374,23 +383,6 @@ class TaskProcessor:
                     TELEGRAM_CHAT_ID,
                     keyboard
                 )
-
-                # Отправляем отчет файлом
-                report_filename = f"report_{guid}.txt"
-                with open(report_filename, 'w', encoding='utf-8') as f:
-                    f.write(diff_report)
-
-                send_telegram_document(
-                    report_filename,
-                    TELEGRAM_CHAT_ID,
-                    f"diff_report_{guid}.txt"
-                )
-
-                # Отправляем разделитель отдельным сообщением
-                separator_message = f"{'=' * 40}"
-                send_telegram_message(separator_message, TELEGRAM_CHAT_ID)
-
-                os.remove(report_filename)
 
         except subprocess.TimeoutExpired:
             print(f"Task {guid} timed out")
@@ -451,10 +443,9 @@ async def message_handler(update: Update, context: CallbackContext) -> None:
     if update.message and update.message.text:
         # Любое сообщение от пользователя - в очередь как промпт
         prompt = update.message.text
-        message_text = f"💬🔔🤖✨ Сообщение от пользователя!\n\nТекст: `{prompt}`"
-
+        #message_text = f"🚀 Принято в работу!\n\nПромпт: `{prompt}` "
         # Отправляем подтверждение
-        await update.message.reply_text(message_text)
+        #await update.message.reply_text(message_text)
 
         # Добавляем в очередь
         guid = str(uuid.uuid4())
