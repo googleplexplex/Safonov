@@ -1,10 +1,12 @@
 using Android.App;
 using Android.Content;
 using Android.OS;
-using Android.Speech;
 using Android.Runtime;
-using SafonovMyBaby.Services;
+using Android.Speech;
 using Microsoft.Maui.ApplicationModel;
+using SafonovMyBaby.Services;
+using System.Xml;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace SafonovMyBaby.Platforms.Android
 {
@@ -41,6 +43,7 @@ namespace SafonovMyBaby.Platforms.Android
             return true;
         }
 
+        private string allText = "";
         public Task<string> StartListeningAsync()
         {
             if (_speechRecognizer == null)
@@ -48,6 +51,9 @@ namespace SafonovMyBaby.Platforms.Android
                 _speechRecognizer = SpeechRecognizer.CreateSpeechRecognizer(_context);
                 _speechRecognizer.SetRecognitionListener(this);
             }
+
+            allText = "";
+            prevText = "";
 
             _isListening = true;
             _recognitionTaskCompletionSource = new TaskCompletionSource<string>();
@@ -92,6 +98,9 @@ namespace SafonovMyBaby.Platforms.Android
 
         public void OnEndOfSpeech()
         {
+            //вот тут своп делать
+            //allText += prevText;
+
             // Сбрасываем флаг при завершении речи, но остаемся в режиме прослушивания
             // Флаг будет сброшен только при явной остановке или ошибке
         }
@@ -138,13 +147,20 @@ namespace SafonovMyBaby.Platforms.Android
             }
         }
 
+        private string prevText = "";
         public void OnPartialResults(Bundle partialResults)
         {
             var matches = partialResults.GetStringArrayList(SpeechRecognizer.ResultsRecognition);
             if (matches != null && matches.Count > 0)
             {
                 var text = matches[0];
-                OnSpeechRecognized?.Invoke(this, text);
+                if (text != "")
+                {
+                    OnSpeechRecognized?.Invoke(this, allText + text);
+                }
+                if (text == "")
+                    allText += prevText;
+                prevText = text;
             }
         }
 
