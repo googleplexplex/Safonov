@@ -3,7 +3,10 @@
     "allow": [
       "Read(//mnt/c/Users/BathDuck/source/repos/SafonovMyBaby/**)",
       "Bash(source:*)",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Bash(python:*)",
+      "Bash(cat:*)",
+      "Bash(sed:*)"
     ],
     "deny": [],
     "ask": []

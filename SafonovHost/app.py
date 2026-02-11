@@ -7,8 +7,8 @@ import threading
 import queue
 import telegram
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import CallbackContext, CommandHandler, CallbackQueryHandler
-from github import Github, GithubException
+from telegram.ext import CallbackContext, CommandHandler, CallbackQueryHandler, MessageHandler, filters
+from github import Github, GithubException, Auth
 from git import Repo, GitCommandError
 from datetime import datetime
 import requests
@@ -39,6 +39,7 @@ active_tasks = {}  # guid -> task_info
 task_messages = {}  # guid -> message_id
 
 # Инициализация GitHub
+from github import Github
 github_client = Github(GITHUB_TOKEN)
 github_repo = github_client.get_repo(GITHUB_REPO_NAME)
 
@@ -306,7 +307,7 @@ class TaskProcessor:
             github_manager.pull_changes()
 
             # 1. Отправляем сообщение в Telegram
-            message_text = f"Промпт: `{prompt}`\n\nGUID: {guid}"
+            message_text = f"🔔🤖✨ Промпт: `{prompt}`\n\n🆔 GUID: {guid}"
 
             if TELEGRAM_CHAT_ID:
                 msg_id = send_telegram_message(message_text, TELEGRAM_CHAT_ID)
@@ -357,10 +358,19 @@ class TaskProcessor:
                     ]
                 }
 
+                # Добавляем stdout/stderr к сообщению как обычный текст
+                final_message = message_text
+
+                if result.stdout.strip():
+                    final_message += f"\n\nSTDOUT:\n{result.stdout.strip()}"
+
+                if result.stderr.strip():
+                    final_message += f"\n\nSTDERR:\n{result.stderr.strip()}"
+
                 # Редактируем сообщение
                 edit_telegram_message(
                     task_messages[guid],
-                    message_text,
+                    final_message,
                     TELEGRAM_CHAT_ID,
                     keyboard
                 )
@@ -375,6 +385,10 @@ class TaskProcessor:
                     TELEGRAM_CHAT_ID,
                     f"diff_report_{guid}.txt"
                 )
+
+                # Отправляем разделитель отдельным сообщением
+                separator_message = f"{'=' * 40}"
+                send_telegram_message(separator_message, TELEGRAM_CHAT_ID)
 
                 os.remove(report_filename)
 
@@ -432,6 +446,29 @@ def neuro():
 
 
 # Telegram Bot Handlers
+async def message_handler(update: Update, context: CallbackContext) -> None:
+    """Обработка обычных сообщений из Telegram"""
+    if update.message and update.message.text:
+        # Любое сообщение от пользователя - в очередь как промпт
+        prompt = update.message.text
+        message_text = f"💬🔔🤖✨ Сообщение от пользователя!\n\nТекст: `{prompt}`"
+
+        # Отправляем подтверждение
+        await update.message.reply_text(message_text)
+
+        # Добавляем в очередь
+        guid = str(uuid.uuid4())
+        task = {
+            'guid': guid,
+            'prompt': prompt
+        }
+        task_queue.put(task)
+        active_tasks[guid] = task
+
+        print(f'User message: {prompt}')
+        print(f'GUID: {guid}')
+        print(f'Task added to queue. Queue size: {task_queue.qsize()}')
+
 async def button_callback(update: Update, context: CallbackContext) -> None:
     """Обработка нажатий на кнопки"""
     query = update.callback_query
@@ -442,11 +479,13 @@ async def button_callback(update: Update, context: CallbackContext) -> None:
 
     if data.startswith('cancel_'):
         # Отмена - revert коммита
-        success, message = revert_task(guid)
+        # Получаем оригинальный текст сообщения
+        original_message = query.message.text
+        success, result_message = revert_task(guid)
         if success:
-            await query.edit_message_text(text=f"✅ {message}")
+            await query.edit_message_text(text=f"🚫🔙 Отмена!\n\n📝 Промпт и GUID:\n{original_message}\n\n✅ {result_message}")
         else:
-            await query.edit_message_text(text=f"❌ {message}")
+            await query.edit_message_text(text=f"❌ {result_message}")
 
     elif data.startswith('retry_'):
         # Повтор - добавляем задачу обратно в очередь
@@ -476,6 +515,7 @@ def run_telegram_bot():
 
     application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
     application.add_handler(CallbackQueryHandler(button_callback))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
 
     print("Telegram bot started for callback handling")
     application.run_polling(stop_signals=None)
